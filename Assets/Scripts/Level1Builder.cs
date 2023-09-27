@@ -67,11 +67,11 @@ public class Level1Builder : MonoBehaviour
 	{
 		foreach(Ship ship in Ships)
 		{
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSeconds(4f);
 			
 			Hangar.AddToken(ship, "Inbound");
 			
-			yield return new WaitForSeconds(0.2f);
+			yield return new WaitForSeconds(2f);
 			
 			ship.OnIntroduce();
 			

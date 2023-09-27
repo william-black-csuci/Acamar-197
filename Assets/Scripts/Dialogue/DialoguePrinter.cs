@@ -10,7 +10,7 @@ public class DialoguePrinter : MonoBehaviour
 	public GameObject RemoteBubblePrefab;
 	public GameObject LocalBubblePrefab;
 	
-	const float FADE_DURATION = 0.75f;
+	const float FADE_DURATION = 0.25f;
 	
 	List<GameObject> TextBubbles = new List<GameObject>();
 	
@@ -118,7 +118,7 @@ public class DialoguePrinter : MonoBehaviour
 			}
 			else
 			{
-				targetPos.y = 900f;
+				targetPos.y = 1700f;
 			}
 			
 			RectTransform imageTransform = image.GetComponent<RectTransform>();
@@ -169,7 +169,7 @@ public class DialoguePrinter : MonoBehaviour
             }*/
 
             // Wait for a moment before proceeding to the next string
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.2f);
 			
 			dialogue = dialogue.Next;
 		}		

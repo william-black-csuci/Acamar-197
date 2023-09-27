@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class HangarManager : MonoBehaviour
 {
+	public GameObject StaticSound;
+	
 	private Dictionary<string, Ship> Zones = new Dictionary<string, Ship>()
 	{
 		{"P1", null},
@@ -114,6 +116,7 @@ public class HangarManager : MonoBehaviour
 	private IEnumerator ClearHangar()
 	{
 		HangarStatic.SetActive(true);
+		StaticSound.SetActive(true);
 		
 		for (float elapsedTime = 0f; elapsedTime < STATIC_TIME; elapsedTime += Time.deltaTime)
 		{
@@ -121,6 +124,7 @@ public class HangarManager : MonoBehaviour
 		}
 		
 		HangarStatic.SetActive(false);
+		StaticSound.SetActive(false);
 	}
 	
 	public Ship GetShip(string zone)
@@ -161,6 +165,7 @@ public class HangarManager : MonoBehaviour
 	private IEnumerator RunInboundStatic()
 	{
 		InboundStatic.SetActive(true);
+		StaticSound.SetActive(true);
 		
 		for (float elapsedTime = 0f; elapsedTime < STATIC_TIME; elapsedTime += Time.deltaTime)
 		{
@@ -168,11 +173,13 @@ public class HangarManager : MonoBehaviour
 		}
 		
 		InboundStatic.SetActive(false);
+		StaticSound.SetActive(false);
 	}
 	
 	private IEnumerator RunHangarStatic()
 	{
 		HangarStatic.SetActive(true);
+		StaticSound.SetActive(true);
 		
 		for (float elapsedTime = 0f; elapsedTime < STATIC_TIME; elapsedTime += Time.deltaTime)
 		{
@@ -180,6 +187,7 @@ public class HangarManager : MonoBehaviour
 		}
 		
 		HangarStatic.SetActive(false);
+		StaticSound.SetActive(false);
 	}
 	
 	public string GetAvailableZone()
