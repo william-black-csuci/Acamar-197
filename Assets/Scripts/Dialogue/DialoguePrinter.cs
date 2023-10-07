@@ -96,16 +96,29 @@ public class DialoguePrinter : MonoBehaviour
 			{
 				uiInstance = Instantiate(RemoteBubblePrefab, transform);
 			}
+			
+			if (dialogue.DialogueFont != null)
+			{
+				//Debug.Log(dialogue.DialogueFont);
+				uiInstance.transform.Find("Text Bubble Words").GetComponent<TMP_Text>().font = dialogue.DialogueFont;
+			}
 
 			Image image = uiInstance.GetComponent<Image>();
             // Set the text of the TMP component
-            TMP_Text textMesh = uiInstance.GetComponentInChildren<TMP_Text>();
+            TextMeshProUGUI textMesh = uiInstance.GetComponentInChildren<TextMeshProUGUI>();//TMP_Text>();
+			RectTransform imageTransform = image.GetComponent<RectTransform>();
+			uiInstance.SetActive(true);
             if (textMesh != null)
             {
                 textMesh.text = dialogue.Text;
+				yield return null;
+				int lines = textMesh.textInfo.lineCount;
+				Vector2 size = imageTransform.sizeDelta;
+				size.y *= lines*0.5f;
+				imageTransform.sizeDelta = size;
             }
 
-			uiInstance.SetActive(true);
+			
 			
 			
 			Color imageColor = image.color;
@@ -114,21 +127,20 @@ public class DialoguePrinter : MonoBehaviour
 			Vector2 targetPos;
 			if (TextBubbles.Count > 0)
 			{
-				targetPos.y = TextBubbles.Last().GetComponent<RectTransform>().anchoredPosition.y - 300f;
+				targetPos.y = TextBubbles.Last().GetComponent<RectTransform>().anchoredPosition.y - textMesh.textInfo.lineCount*150f;
 			}
 			else
 			{
-				targetPos.y = 1700f;
+				targetPos.y = 1850f - (textMesh.textInfo.lineCount*75);
 			}
 			
-			RectTransform imageTransform = image.GetComponent<RectTransform>();
 			targetPos.x = imageTransform.anchoredPosition.x;
 			Vector2 initialPos = imageTransform.anchoredPosition;
 			
 			float elapsedTime = 0f;
 			while (elapsedTime < FADE_DURATION)
 			{
-				imageColor.a = Mathf.Lerp(0f, 1f, elapsedTime / FADE_DURATION);
+				imageColor.a = Mathf.Lerp(0f, 0.7f, elapsedTime / FADE_DURATION);
 				textColor.a = Mathf.Lerp(0f, 1f, elapsedTime / FADE_DURATION);
 				
 				image.color = imageColor;
@@ -141,7 +153,7 @@ public class DialoguePrinter : MonoBehaviour
 				yield return null;
 			}
 			
-			imageColor.a = 1f;
+			imageColor.a = 0.7f;
 			textColor.a = 1f;
 			image.color = imageColor;
 			textMesh.color = textColor;

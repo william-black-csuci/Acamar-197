@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,3 +10,4 @@ public abstract class InboundShip : Ship
 		GameObject.FindWithTag("Hangar").GetComponent<HangarManager>().AddToken(this, Zone);
 	}
 }
+*/

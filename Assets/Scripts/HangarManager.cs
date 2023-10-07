@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class HangarManager : MonoBehaviour
 {
 	public GameObject StaticSound;
 	
-	private Dictionary<string, Ship> Zones = new Dictionary<string, Ship>()
-	{
+	private Dictionary<string, Encounter> Zones = new Dictionary<string, Encounter>();
+	/*{
 		{"P1", null},
 		{"A1", null},
 		{"A2", null},
@@ -17,7 +18,7 @@ public class HangarManager : MonoBehaviour
 		{"A5", null},
 		{"A6", null},
 		{"Inbound", null}
-	};
+	};*/
 	
 	[SerializeField]
 	private GameObject HangarStatic;
@@ -27,9 +28,12 @@ public class HangarManager : MonoBehaviour
 	private string[] TokenZones;
 	[SerializeField]
 	private Image[] TokenImages;
+	[SerializeField]
+	private Sprite Transparent;
 	
 	private Dictionary<string, Image> Tokens = new Dictionary<string, Image>();
 	
+	[SerializeField]
 	private Image InboundImage;
 	
 	private const float STATIC_TIME = 0.3f;
@@ -37,13 +41,19 @@ public class HangarManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-		InboundImage = GameObject.FindWithTag("Inbound Ship").GetComponent<Image>();
+		//InboundImage = GameObject.FindWithTag("Inbound Ship").GetComponent<Image>();
 		
 		for (int i = 0; i < TokenZones.Length && i < TokenImages.Length; i++)
 		{
 			Tokens.Add(TokenZones[i], TokenImages[i]);
+			Zones.Add(TokenZones[i], null);
 		}
 		
+		foreach (Transform child in Hidden.transform)
+		{
+			Hangars.Add(child.gameObject);
+		}
+		SetActiveHangar("A");
     }
 
     public bool IsAvailable(string zone)
@@ -76,7 +86,7 @@ public class HangarManager : MonoBehaviour
 		InboundStatic.SetActive(false);
 	}
 	
-	public Ship ClearHangar(string zone)
+	public Encounter ClearHangar(string zone)
 	{
 		if (zone == "Inbound")
 		{
@@ -86,8 +96,9 @@ public class HangarManager : MonoBehaviour
 			}
 			
 			StartCoroutine(ClearInbound());
-			Ship ship = Zones["Inbound"];
+			Encounter ship = Zones["Inbound"];
 			Zones["Inbound"] = null;
+			Tokens[zone].sprite = Transparent;
 			return ship;
 		}
 		else if (Zones.ContainsKey(zone))
@@ -98,10 +109,10 @@ public class HangarManager : MonoBehaviour
 			}
 			
 			StartCoroutine(ClearHangar());
-			Color spriteColor = Zones[zone].Token.color;
+			Color spriteColor = Tokens[zone].color;
 			spriteColor.a = 0f;
-			Zones[zone].Token.color = spriteColor;
-			Ship ship = Zones["inbound"];
+			Tokens[zone].color = spriteColor;
+			Encounter ship = Zones["Inbound"];
 			Zones[zone] = null;
 			
 			return ship;
@@ -127,7 +138,7 @@ public class HangarManager : MonoBehaviour
 		StaticSound.SetActive(false);
 	}
 	
-	public Ship GetShip(string zone)
+	public Encounter GetShip(string zone)
 	{
 		if (Zones.ContainsKey(zone) == false)
 		{
@@ -139,7 +150,7 @@ public class HangarManager : MonoBehaviour
 		}
 	}
 	
-	public void AddToken(Ship ship, string zone)
+	public void AddToken(Encounter ship, string zone)
 	{
 		if (Zones.ContainsKey(zone) == false || Zones[zone] != null)
 		{
@@ -155,8 +166,10 @@ public class HangarManager : MonoBehaviour
 			StartCoroutine(RunHangarStatic());
 		}
 		
+		//Debug.Log(zone);
 		Zones[zone] = ship;
-		ship.SetToken(Tokens[zone]);
+		Tokens[zone].sprite = ship.Image;
+		//ship.SetToken(Tokens[zone]);
 		Color color = Tokens[zone].color;
 		color.a = 1f;
 		Tokens[zone].color = color;
@@ -201,4 +214,53 @@ public class HangarManager : MonoBehaviour
 		
 		return zone;
 	}
+	
+	private GameObject CurrentHangar;
+	[SerializeField]
+	private GameObject Hidden;
+	[SerializeField]
+	private GameObject Active;
+	private List<GameObject> Hangars = new List<GameObject>();
+	
+	public void SetActiveHangar(string name)
+	{
+		if (CurrentHangar == null || name != CurrentHangar.name)
+		{
+			if (CurrentHangar != null)
+			{
+				CurrentHangar.transform.SetParent(Hidden.transform);
+				StartCoroutine(RunHangarStatic());
+			}
+			
+			foreach (GameObject hangar in Hangars)
+			{
+				if (hangar.name == name)
+				{
+					CurrentHangar = hangar;
+					hangar.transform.SetParent(Active.transform);
+					return;
+				}
+			}
+			
+			Debug.LogError(String.Format("Failed to find hangar: {0}", name));
+		}
+	}
+	
+	public float GetOccupied()
+	{
+		int max = 0;
+		int occupied = 0;
+		
+		foreach (Encounter ship in Zones.Values)
+		{
+			max++;
+			if (ship != null)
+			{
+				occupied++;
+			}
+		}
+		
+		return (float)occupied / (float)max;
+	}
+	
 }

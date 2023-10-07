@@ -2,29 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
+using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
 {
-	public float MenuWidth;
-	public float MenuHeight;
+	[SerializeField]
+	protected float MenuWidth;
+	[SerializeField]
+	protected float MenuHeight;
 	
-	private RectTransform Scroller;
-	private RectTransform Mask;
+	protected RectTransform Mask;
 	private RectTransform MenuTransform;
 	private Camera SceneCamera;
 	
-	private const float EXPAND_TIME = 0.25f;
-	private bool Active = false;
+	protected const float EXPAND_TIME = 0.25f;
+	protected bool Active = false;
 	
-	void Start()
+	protected virtual void Start()
 	{
 		MenuTransform = gameObject.GetComponent<RectTransform>();
 		Mask = transform.Find("Mask").GetComponent<RectTransform>();
-		Scroller = Mask.transform.Find("Scroll View").GetComponent<RectTransform>();
 		SceneCamera = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
 	}
 	
-    public void Activate()
+    public virtual void Activate()
 	{
 		if (Active == false)
 		{
@@ -43,15 +45,12 @@ public class Menu : MonoBehaviour
 			size.x = Mathf.Lerp(0f, MenuWidth, elapsedTime / EXPAND_TIME);
 			Mask.sizeDelta = size;
 			
-			Scroller.sizeDelta = Mask.sizeDelta;
-			
 			yield return null;
 		}
 		
 		size.y = MenuHeight;
 		size.x = MenuWidth;
 		Mask.sizeDelta = size;
-		Scroller.sizeDelta = Mask.sizeDelta;
 	}
 	
 	public void Deactivate()

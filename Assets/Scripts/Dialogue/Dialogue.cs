@@ -17,6 +17,8 @@ public class Dialogue
 	
 	public Speaker Talker { get; private set; }
 	
+	public TMP_FontAsset DialogueFont;
+	
     public Dialogue(string text, Speaker speaker)
 	{
 		Text = text;

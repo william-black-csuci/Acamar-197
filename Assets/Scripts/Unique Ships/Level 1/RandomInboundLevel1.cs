@@ -1,10 +1,14 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 public class RandomInboundLevel1 : InboundShip
 {
+	
+	
+	
 	private string[] InboundGreetings = new string[]
 	{
 		"Hello Control",
@@ -22,7 +26,7 @@ public class RandomInboundLevel1 : InboundShip
 		"Transfer your clearance codes"
 	};
 	
-    public RandomInboundLevel1()
+    public RandomInboundLevel1(TMP_FontAsset font=null)
 	{
 		SetSprite("Ship");
 		
@@ -39,9 +43,11 @@ public class RandomInboundLevel1 : InboundShip
 		AddGreeting("Welcome to Acamar 197", Speaker.local);
 		AddGreeting(ControlGreetings[UnityEngine.Random.Range(0, ControlGreetings.Length)], Speaker.local);
 		AddGreeting(InboundGreetings[UnityEngine.Random.Range(0, InboundGreetings.Length)], Speaker.remote);
+		Font = font;
 		if (Authorized)
 		{
 			AddGreeting(GameObject.FindWithTag("Clearance Generator").GetComponent<ClearanceGenerator>().GetRealCode().ToString(), Speaker.remote);
+			
 		}
 		else
 		{
@@ -49,3 +55,4 @@ public class RandomInboundLevel1 : InboundShip
 		}
 	}
 }
+*/

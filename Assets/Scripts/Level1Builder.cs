@@ -9,8 +9,12 @@ public class Level1Builder : MonoBehaviour
 {
 	private List<Ship> Ships = new List<Ship>();
 	private HangarManager Hangar;
-	private TMP_InputField ZoneField;
+	//private TMP_InputField ZoneField;
+	[SerializeField]
+	private AuthorizationMenu Authorization;
 	private DialoguePrinter Printer;
+	[SerializeField]
+	private TMP_FontAsset ClearanceFont;
 	
 	private string[] Zones = new string[]
 	{
@@ -20,14 +24,22 @@ public class Level1Builder : MonoBehaviour
 		"A3",
 		"A4",
 		"A5",
-		"A6"
+		"A6",
+		"B1",
+		"B2",
+		"B3",
+		"B4",
+		"B5",
+		"B6",
+		"P2"
 	};
 	
 	void Start()
 	{
 		Hangar = GameObject.FindWithTag("Hangar").GetComponent<HangarManager>();
-		ZoneField = GameObject.FindWithTag("Zone Field").GetComponent<TMP_InputField>();
+		//ZoneField = GameObject.FindWithTag("Zone Field").GetComponent<TMP_InputField>();
 		Printer = GameObject.FindWithTag("Printer").GetComponent<DialoguePrinter>();
+		//Authorization = GameObject.FindWithTag("Authorization Menu").GetComponent<AuthorizationMenu>();
 		/*int landed = 0;
 		Ship ship;
 		for (int i = 0; i < 12; i++)
@@ -53,19 +65,78 @@ public class Level1Builder : MonoBehaviour
 			}
 		}*/
 		
-		Ship ship;
+		/*Ship ship;
 		for (int i = 0; i < 7; i++)
 		{
-			ship = new RandomInboundLevel1();
+			ship = new RandomInboundLevel1(ClearanceFont);
+			ship.Font = ClearanceFont;
 			Ships.Add(ship);
-		}
+		}*/
 		UpdateFeedback();
 		StartCoroutine(RunLevel());
 	}
 	
 	private IEnumerator RunLevel()
 	{
-		foreach(Ship ship in Ships)
+		int encounterNum = 1;
+		Encounter ship;
+		for (;; encounterNum++)
+		{
+			switch (encounterNum)
+			{
+				case 4:
+					ship = gameObject.AddComponent(typeof(BadCodeShip1)) as Encounter;
+					break;
+				case 10:
+					ship = gameObject.AddComponent(typeof(MedicalShip1)) as Encounter;
+					break;
+				default:
+					ship = gameObject.AddComponent(typeof(Encounter1)) as Encounter;
+					break;
+			}
+			
+			ship.Authorization = Authorization;
+			
+			yield return StartCoroutine(ship.StartEncounter());
+			
+			while (!Authorized && !Denied)
+			{
+				yield return null;
+			}
+			
+			if (Authorized)
+			{
+				if (ship.Authorized)
+				{
+					Right++;
+				}
+				else
+				{
+					Wrong++;
+				}
+				
+				yield return StartCoroutine(ship.Authorize());
+			}
+			else if (Denied)
+			{
+				if (ship.Authorized)
+				{
+					Wrong++;
+				}
+				else
+				{
+					Right++;
+				}
+				
+				yield return StartCoroutine(ship.Deny());
+			}
+			
+			
+			Authorized = false;
+			Denied = false;
+			UpdateFeedback();
+		}
+		/*foreach(Ship ship in Ships)
 		{
 			yield return new WaitForSeconds(4f);
 			
@@ -84,6 +155,7 @@ public class Level1Builder : MonoBehaviour
 			{
 				yield return new WaitForSeconds(0.1f);
 				Hangar.ClearHangar("Inbound");
+				//Debug.Log(ZoneSelect);
 				Hangar.AddToken(ship, ZoneSelect);
 				Authorized = false;
 				Denied = false;
@@ -117,7 +189,7 @@ public class Level1Builder : MonoBehaviour
 			Printer.ClearDialogue();
 			UpdateFeedback();
 			
-		}
+		}*/
 		
 	}
 	private int Right = 0;
@@ -128,18 +200,26 @@ public class Level1Builder : MonoBehaviour
 	
 	public void OnAuthorize()
 	{
-		if (Zones.Contains(ZoneField.text) && Hangar.IsAvailable(ZoneField.text))
+		
+		Debug.Log(String.Format("Zones: {0}", Zones));
+		RightText.text = "hi";
+		Debug.Log(String.Format("Authorization: {0}", Authorization));//.GetSelectedHangar());
+		WrongText.text = "hi";
+		Debug.Log(String.Format("Selected Hangar: {0}", Authorization.GetSelectedHangar()));
+		Debug.Log(String.Format("Hangar: {0}", Hangar));
+		RightText.text = "bye";
+		if (Zones.Contains(Authorization.GetSelectedHangar()) && Hangar.IsAvailable(Authorization.GetSelectedHangar()))
 		{
 			Authorized = true;
-			ZoneSelect = ZoneField.text;
+			ZoneSelect = Authorization.GetSelectedHangar();
 		}
-		Debug.Log("Authorize");
+		//Debug.Log("Authorize");
 	}
 	
 	public void OnDeny()
 	{
 		Denied = true;
-		Debug.Log("Deny");
+		//Debug.Log("Deny");
 	}
 	
 	public TMP_Text RightText;
@@ -158,7 +238,7 @@ public class Level1Builder : MonoBehaviour
 	// 6-9: random
 	// 10: medical emergency (deny)
 	// 11: random
-	// 12: slave trader
+	// 12: slave trader (accept)
 	
 	// wait
 	// send ship

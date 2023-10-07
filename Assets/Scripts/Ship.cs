@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public abstract class Ship
 {
@@ -13,6 +14,7 @@ public abstract class Ship
 	private Dialogue DenyDialogue;
 	public string Zone = "Inbound";
 	public string Target = ""; 
+	public TMP_FontAsset Font { private get; set; } = null;
 	
 	public void SetToken(Image token)
 	{
@@ -23,14 +25,20 @@ public abstract class Ship
 	protected void AddGreeting(string text, Speaker speaker)
 	{
 		Dialogue dialogue = Greeting;
-		
+		Dialogue newDialogue;
 		if (dialogue == null)
 		{
 			dialogue = new Dialogue(text, speaker);
+			newDialogue = dialogue;
 		}
 		else
 		{
-			dialogue.AddDialogue(text, speaker);
+			newDialogue = dialogue.AddDialogue(text, speaker);
+		}
+		
+		if (Font != null)
+		{
+			newDialogue.DialogueFont = Font;
 		}
 		
 		Greeting = dialogue;
